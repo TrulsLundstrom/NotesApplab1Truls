@@ -17,7 +17,6 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 
 import androidx.compose.runtime.*
-
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.setValue
 
@@ -100,8 +99,8 @@ fun NoteItem(note: Note, onClick: () -> Unit){
 
 @Composable
 fun CreateNoteScreen(notes: List<Note>, navController: NavController, noteIndex: Int? = null, viewModel: NotesViewModel){
-    // just nu så kan inte både error message för titeln och för texten visas, gör kanske så att båda felmedelanden kan visas.
-    
+    // just nu så kan inte både error message för titeln och för texten visas, gör kanske så att båda felmedelanden kan visas. Uppnå detta genom att ha en lista med felmeddelanden i validateInputs funktionen
+
     var title by remember { mutableStateOf("") }
     var text by remember { mutableStateOf("") }
     var errorMessage by remember { mutableStateOf("") }
@@ -191,15 +190,13 @@ att göra:
 
 -just nu så kan du endast skapa en note. Lägg till funktionen till att flera stycken.
 
--gör kanske alla klasser till en separat fil.
-
 -lägg kanske till datum på varje anteckning
 
 - när du uppdaterar anteckningen, gör kanske en "revert back to previous version" knapp.
 
 - när du har skapat din första note, gör kanske så att flera knappar kommer fram längst upp, t.ex delete. Om du inte har skapat en note än, så ska inte en delete knapp finnas.
 
-- gör en informations knapp, om du klickar på den så kommer en beskrivning, t.ex: klicka på en anteckning för att uppdatera och spara förändringar etc...
+- gör kanske en informations knapp, om du klickar på den så kommer en beskrivning, t.ex: klicka på en anteckning för att uppdatera och spara förändringar etc...
 
  - ändra ALLA kommentarer till engelska och ta bort allting som är på svenska och ersätt dem.
  */
