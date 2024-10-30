@@ -1,4 +1,3 @@
-
 package com.example.notesapplab1truls
 
 import android.os.Bundle
@@ -100,63 +99,73 @@ fun NoteItem(note: Note, onClick: () -> Unit){
 }
 
 @Composable
-fun CreateNoteScreen(notes: List<Note>, navController: NavController, noteIndex: Int? = null, viewModel: NotesViewModel){ // ändra kanske tillbaka detta så att det liknar utseendet av andra delar av koden
+fun CreateNoteScreen(notes: List<Note>, navController: NavController, noteIndex: Int? = null, viewModel: NotesViewModel){
+    // just nu så kan inte både error message för titeln och för texten visas, gör kanske så att båda felmedelanden kan visas.
+    
+    var title by remember { mutableStateOf("") }
+    var text by remember { mutableStateOf("") }
+    var errorMessage by remember { mutableStateOf("") }
 
-    var title by remember{ mutableStateOf("") }
-    var text by remember{ mutableStateOf("") }
-    var errorMessage by remember{ mutableStateOf("") }
+    LaunchedEffect(noteIndex) {
 
-    LaunchedEffect(noteIndex){
-        noteIndex?.let{ index ->
-            if(index >= 0 && index < notes.size){ // Check if index is valid
+        noteIndex?.let { index ->
+            if (index >= 0 && index < notes.size) {
                 val note = notes[index]
                 title = note.title
                 text = note.text
+                }
+            }
+        }
+
+        Column(modifier = Modifier.padding(16.dp)) {
+
+            TextField(
+                value = title,
+                onValueChange = { newTitle -> title = newTitle },
+                label = { Text("Title") },
+                isError = title.length < 3 || title.length > 50
+            )
+
+            TextField(
+                value = text,
+                onValueChange = { newText -> text = newText },
+                label = { Text("Text") },
+                isError = text.length > 120
+            )
+
+            if(errorMessage.isNotEmpty()){
+                Text(
+                    text = errorMessage,
+                    color = MaterialTheme.colorScheme.error,
+                    style = MaterialTheme.typography.bodySmall,
+                    modifier = Modifier.padding(top = 8.dp)
+                )
+            }
+
+            Button(onClick = {
+                errorMessage = validateInputs(title, text)
+
+                if(errorMessage.isEmpty()){
+                    if(noteIndex != null && noteIndex < notes.size){
+                        viewModel.updateNote(noteIndex, Note(title, text))
+                    }
+                    else{
+                        viewModel.addNote(Note(title, text))
+                    }
+                    navController.navigate("main"){
+                        popUpTo("main") { inclusive = true }
+                    }
+                }
+            }) {
+                Text("Save Note")
             }
         }
     }
-
-    Column(modifier = Modifier.padding(16.dp)){
-
-        TextField(value = title, // State variable
-            onValueChange = { newTitle -> title = newTitle }, // Update state
-            label = { Text("Title") },
-            isError = title.length < 3 || title.length > 50 // The title is invalid if it is <3 or >50
-        )
-
-        TextField(
-            value = text, // State variable
-            onValueChange = { newText -> text = newText }, // Update state
-            label = { Text("Text") },
-            isError = text.length > 120
-        )
-
-        Button(onClick = {
-            errorMessage = validateInputs(title, text)
-
-            if(errorMessage.isEmpty()){
-                if(noteIndex != null && noteIndex < notes.size){
-                    viewModel.updateNote(noteIndex, Note(title, text))
-                }
-                else{
-                    viewModel.addNote(Note(title, text)) // Add to viewModel's list
-                }
-
-                navController.navigate("main"){
-                    popUpTo("main"){ inclusive = true }
-                }
-
-            }
-        }){
-            Text("Save Note")
-        }
-    }
-} // enligt mig blev min kod förvirande => ändra kanske koden ovanför så att den blir mer lättläst och lättare att förså.
 
 private fun validateInputs(title: String, text: String): String{ // gör så att det som returneras faktiskt används. just nu om du t.ex skriver en titel med 2 tecken så vissas inte något felmedelande
 
     if(title.length < 3){
-        return "Title must be at least 3 charechters long."
+        return "Title must be at least 3 characters long."
     }
     else if(title.length > 50){
         return "Title must be at most 50 characters long."
@@ -164,7 +173,6 @@ private fun validateInputs(title: String, text: String): String{ // gör så att
     else if(text.length > 120){
         return "Text must be at most 120 characters long."
     }
-
     return ""
 }
 
