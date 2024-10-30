@@ -28,7 +28,6 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import androidx.navigation.compose.*
 
-import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewmodel.compose.viewModel
 
 import androidx.navigation.compose.rememberNavController
@@ -154,7 +153,7 @@ fun CreateNoteScreen(notes: List<Note>, navController: NavController, noteIndex:
     }
 } // enligt mig blev min kod förvirande => ändra kanske koden ovanför så att den blir mer lättläst och lättare att förså.
 
-private fun validateInputs(title: String, text: String): String{
+private fun validateInputs(title: String, text: String): String{ // gör så att det som returneras faktiskt används. just nu om du t.ex skriver en titel med 2 tecken så vissas inte något felmedelande
 
     if(title.length < 3){
         return "Title must be at least 3 charechters long."
@@ -165,44 +164,8 @@ private fun validateInputs(title: String, text: String): String{
     else if(text.length > 120){
         return "Text must be at most 120 characters long."
     }
-    else{
-        return ""
-    }
 
-}
-
-
-/* TIDIGARE KOD SOM DU GJORDE:
-
-denna varianten av din kod är bara krånglig och konstig. ha kvar denna just nu för att vissa att andra varianter av koden kan göras.
-
-private fun validateInputs(title: String, text: String): String{
-
-    return when{
-        title.length < 3 -> "Title must be at least 3 charecters."
-        tile.length > 50 -> "Title must be at most 50 charecters."
-        text.length > 120 -> "Text must be at most 120 charecters."
-        else -> ""
-
-    // just nu så används inte dessa texter till något, gör så att ett felmedelande visas om du försöker skapa/spara en note med felaktigt antal tecken.
-    }
-}
-
-
- */
-
-class NotesViewModel : ViewModel(){ // gör kanske en helt ny fil för denna klassen.
-
-    private val _notes = mutableStateListOf<Note>()
-    val notes: List<Note> = _notes
-
-    fun addNote(note: Note){
-        _notes.add(note)
-    }
-
-    fun updateNote(index: Int, note: Note){
-        _notes[index] = note
-    }
+    return ""
 }
 
 /*
