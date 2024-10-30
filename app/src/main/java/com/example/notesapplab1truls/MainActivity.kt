@@ -35,7 +35,7 @@ import androidx.navigation.compose.rememberNavController
 
 // det ovanför, ändra kanske tillbaka det så att allting "sitter ihop"
 
-data class Note(
+data class Note( // This is the data class for the note. A note always contains a title and the text.
     var title: String,
     var text: String
 )
@@ -79,7 +79,7 @@ fun MainScreen(notes: List<Note>, navController: NavController){
         }
 
         LazyColumn{
-            items(notes){ note -> //
+            items(notes){ note ->
                 NoteItem(note = note, onClick = {
                     navController.navigate("create_note/${notes.indexOf(note)}")
                 })
@@ -122,7 +122,7 @@ fun CreateNoteScreen(notes: List<Note>, navController: NavController, noteIndex:
         TextField(value = title, // State variable
             onValueChange = { newTitle -> title = newTitle }, // Update state
             label = { Text("Title") },
-            isError = title.length < 3 || title.length > 50
+            isError = title.length < 3 || title.length > 50 // The title is invalid if it is <3 or >50
         )
 
         TextField(
@@ -157,12 +157,12 @@ fun CreateNoteScreen(notes: List<Note>, navController: NavController, noteIndex:
 private fun validateInputs(title: String, text: String): String{
 
     return when{
-        title.length < 3 -> "Title must be at least 3 characters."
+        title.length < 3 -> "Title must be at least 3 characters." // just nu så används inte texten till något, gör så att ett felmedelande visas om du försöker skapa/spara en note med felaktigt antal tecken.
         title.length > 50 -> "Title must be at most 50 characters."
         text.length > 120 -> "Text must be at most 120 characters."
         else -> ""
     }
-}
+} // gör om detta till en if-satser. Även om det är bra att jag kodade en ny variant så är det bättre att använda sånt du har gjort tidigare. 
 
 class NotesViewModel : ViewModel(){ // gör kanske en helt ny fil för denna klassen.
 
@@ -194,4 +194,11 @@ TODO:
 
 -gör kanske alla klasser till en separat fil.
 
+-lägg kanske till datum på varje anteckning
+
+- när du uppdaterar anteckningen, gör kanske en "revert back to previous version" knapp.
+
+- när du har skapat din första note, gör kanske så att flera knappar kommer fram längst upp, t.ex delete. Om du inte har skapat en note än, så ska inte en delete knapp finnas.
+
+- gör en informations knapp, om du klickar på den så kommer en beskrivning, t.ex: klicka på en anteckning för att uppdatera och spara förändringar etc...
  */
