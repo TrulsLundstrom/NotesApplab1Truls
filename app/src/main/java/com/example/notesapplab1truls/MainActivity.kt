@@ -30,9 +30,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 
 import androidx.navigation.compose.rememberNavController
 
-// det ovanför, ändra kanske tillbaka det så att allting "sitter ihop"
-
-data class Note( // This is the data class for the note. A note always contains a title and the text.
+data class Note(
     var title: String,
     var text: String
 )
@@ -99,104 +97,98 @@ fun NoteItem(note: Note, onClick: () -> Unit){
 
 @Composable
 fun CreateNoteScreen(notes: List<Note>, navController: NavController, noteIndex: Int? = null, viewModel: NotesViewModel){
-    // just nu så kan inte både error message för titeln och för texten visas, gör kanske så att båda felmedelanden kan visas. Uppnå detta genom att ha en lista med felmeddelanden i validateInputs funktionen
 
     var title by remember { mutableStateOf("") }
     var text by remember { mutableStateOf("") }
-    var errorMessage by remember { mutableStateOf("") }
+    var errorMessages by remember { mutableStateOf(emptyList<String>()) }
 
-    LaunchedEffect(noteIndex) {
-
+    LaunchedEffect(noteIndex){
         noteIndex?.let { index ->
-            if (index >= 0 && index < notes.size) {
+            if(index >= 0 && index < notes.size){
                 val note = notes[index]
                 title = note.title
                 text = note.text
-                }
-            }
-        }
-
-        Column(modifier = Modifier.padding(16.dp)) {
-
-            TextField(
-                value = title,
-                onValueChange = { newTitle -> title = newTitle },
-                label = { Text("Title") },
-                isError = title.length < 3 || title.length > 50
-            )
-
-            TextField(
-                value = text,
-                onValueChange = { newText -> text = newText },
-                label = { Text("Text") },
-                isError = text.length > 120
-            )
-
-            if(errorMessage.isNotEmpty()){
-                Text(
-                    text = errorMessage,
-                    color = MaterialTheme.colorScheme.error,
-                    style = MaterialTheme.typography.bodySmall,
-                    modifier = Modifier.padding(top = 8.dp)
-                )
-            }
-
-            Button(onClick = {
-                errorMessage = validateInputs(title, text)
-
-                if(errorMessage.isEmpty()){
-                    if(noteIndex != null && noteIndex < notes.size){
-                        viewModel.updateNote(noteIndex, Note(title, text))
-                    }
-                    else{
-                        viewModel.addNote(Note(title, text))
-                    }
-                    navController.navigate("main"){
-                        popUpTo("main") { inclusive = true }
-                    }
-                }
-            }) {
-                Text("Save Note")
             }
         }
     }
 
-private fun validateInputs(title: String, text: String): String{ // gör så att det som returneras faktiskt används. just nu om du t.ex skriver en titel med 2 tecken så vissas inte något felmedelande
+    Column(modifier = Modifier.padding(16.dp)){
+        TextField(
+            value = title,
+            onValueChange = { newTitle -> title = newTitle },
+            label = { Text("Title") },
+            isError = title.length < 3 || title.length > 50
+        )
 
-    if(title.length < 3){
-        return "Title must be at least 3 characters long."
+        // Visa specifikt felmeddelande för titeln
+        if(errorMessages.any { it.contains("Title") }){
+            Text(
+                text = errorMessages.first { it.contains("Title") },
+                color = MaterialTheme.colorScheme.error,
+                style = MaterialTheme.typography.bodySmall,
+                modifier = Modifier.padding(top = 4.dp)
+            )
+        }
+
+        TextField(
+            value = text,
+            onValueChange = { newText -> text = newText },
+            label = { Text("Text") },
+            isError = text.length > 120
+        )
+
+        // Visa specifikt felmeddelande för texten
+        if(errorMessages.any { it.contains("Text") }){
+            Text(
+                text = errorMessages.first { it.contains("Text") },
+                color = MaterialTheme.colorScheme.error,
+                style = MaterialTheme.typography.bodySmall,
+                modifier = Modifier.padding(top = 4.dp)
+            )
+        }
+
+        Button(onClick = {
+            errorMessages = validateInputs(title, text)
+
+            if (errorMessages.isEmpty()){
+                if (noteIndex != null && noteIndex < notes.size){
+                    viewModel.updateNote(noteIndex, Note(title, text))
+                } else {
+                    viewModel.addNote(Note(title, text))
+                }
+                navController.navigate("main"){
+                    popUpTo("main") { inclusive = true }
+                }
+            }
+        }){
+            Text("Save Note")
+        }
+    }
+}
+
+private fun validateInputs(title: String, text: String): List<String>{
+
+    val errors = mutableListOf<String>()
+
+    if (title.length < 3){
+        errors.add("Title must be at least 3 characters long.")
     }
     else if(title.length > 50){
-        return "Title must be at most 50 characters long."
+        errors.add("Title must be at most 50 characters long.")
     }
-    else if(text.length > 120){
-        return "Text must be at most 120 characters long."
+    if(text.length > 120){
+        errors.add("Text must be at most 120 characters long.")
     }
-    return ""
+    return errors
 }
 
 /*
 att göra:
 
--lägg till kommentarer som förklarar delar av koden. Just nu kan det vara svårt för andra programmerare att förstå din kod. Kan även vara bra i framtiden om du kollar tillbaka på din kod och vill förstå vad du gjorde.
-
 -delete note
 
 -browse an overview of all notes
 
--checkbox (?)
-
--update note ( just nu använder du en save knapp, men det kanske är tillräkligt)
-
 -just nu så kan du endast skapa en note. Lägg till funktionen till att flera stycken.
 
--lägg kanske till datum på varje anteckning
-
-- när du uppdaterar anteckningen, gör kanske en "revert back to previous version" knapp.
-
-- när du har skapat din första note, gör kanske så att flera knappar kommer fram längst upp, t.ex delete. Om du inte har skapat en note än, så ska inte en delete knapp finnas.
-
-- gör kanske en informations knapp, om du klickar på den så kommer en beskrivning, t.ex: klicka på en anteckning för att uppdatera och spara förändringar etc...
-
- - ändra ALLA kommentarer till engelska och ta bort allting som är på svenska och ersätt dem.
  */
