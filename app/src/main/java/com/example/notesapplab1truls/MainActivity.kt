@@ -156,13 +156,40 @@ fun CreateNoteScreen(notes: List<Note>, navController: NavController, noteIndex:
 
 private fun validateInputs(title: String, text: String): String{
 
-    return when{
-        title.length < 3 -> "Title must be at least 3 characters." // just nu så används inte texten till något, gör så att ett felmedelande visas om du försöker skapa/spara en note med felaktigt antal tecken.
-        title.length > 50 -> "Title must be at most 50 characters."
-        text.length > 120 -> "Text must be at most 120 characters."
-        else -> ""
+    if(title.length < 3){
+        return "Title must be at least 3 charechters long."
     }
-} // gör om detta till en if-satser. Även om det är bra att jag kodade en ny variant så är det bättre att använda sånt du har gjort tidigare. 
+    else if(title.length > 50){
+        return "Title must be at most 50 characters long."
+    }
+    else if(text.length > 120){
+        return "Text must be at most 120 characters long."
+    }
+    else{
+        return ""
+    }
+
+}
+
+
+/* TIDIGARE KOD SOM DU GJORDE:
+
+denna varianten av din kod är bara krånglig och konstig. ha kvar denna just nu för att vissa att andra varianter av koden kan göras.
+
+private fun validateInputs(title: String, text: String): String{
+
+    return when{
+        title.length < 3 -> "Title must be at least 3 charecters."
+        tile.length > 50 -> "Title must be at most 50 charecters."
+        text.length > 120 -> "Text must be at most 120 charecters."
+        else -> ""
+
+    // just nu så används inte dessa texter till något, gör så att ett felmedelande visas om du försöker skapa/spara en note med felaktigt antal tecken.
+    }
+}
+
+
+ */
 
 class NotesViewModel : ViewModel(){ // gör kanske en helt ny fil för denna klassen.
 
@@ -179,7 +206,8 @@ class NotesViewModel : ViewModel(){ // gör kanske en helt ny fil för denna kla
 }
 
 /*
-TODO:
+att göra:
+
 -lägg till kommentarer som förklarar delar av koden. Just nu kan det vara svårt för andra programmerare att förstå din kod. Kan även vara bra i framtiden om du kollar tillbaka på din kod och vill förstå vad du gjorde.
 
 -delete note
@@ -201,4 +229,6 @@ TODO:
 - när du har skapat din första note, gör kanske så att flera knappar kommer fram längst upp, t.ex delete. Om du inte har skapat en note än, så ska inte en delete knapp finnas.
 
 - gör en informations knapp, om du klickar på den så kommer en beskrivning, t.ex: klicka på en anteckning för att uppdatera och spara förändringar etc...
+
+ - ändra ALLA kommentarer till engelska och ta bort allting som är på svenska och ersätt dem.
  */
